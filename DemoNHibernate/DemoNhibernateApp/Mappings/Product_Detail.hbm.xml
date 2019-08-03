@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="DemoNhibernateApp" namespace="DemoNhibernateApp.Domain">
+  <class name="Product">
+    <id name="Id">
+      <generator class="native" />
+    </id>
+    <property name="Name"
+              type="String"/>
+    <property name="Category" />
+    <property name="Discontinued" />
+    <set name="Detail"
+         batch-size="50"
+         fetch="select"
+         cascade="save-update">
+      <key column="Product_id"/>
+      <one-to-many class="Detail"/>
+    </set>
+  </class>
+
+  <class name="Detail"
+         batch-size="50">
+    <id name="Id">
+      <generator class="native"/>
+    </id>
+    <property name="Note"/>
+  </class>
+</hibernate-mapping>
