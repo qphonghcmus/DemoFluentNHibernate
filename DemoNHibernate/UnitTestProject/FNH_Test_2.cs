@@ -3,20 +3,22 @@ using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using FluentNHibernate.Utils;
+using System.Timers;
 using FluentNHibernateApp.Entities;
 using FluentNHibernateApp.Repositories;
+using FluentNHibernateApp.Views;
 using log4net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Timer = System.Timers.Timer;
+using NHibernate.Mapping;
 
 namespace UnitTestProject
 {
-
+    /// <summary>
+    /// Summary description for FNH_Test_2
+    /// </summary>
     [TestClass]
-    public class FNH_Test
+    public class FNH_Test_2
     {
         #region properties
 
@@ -148,10 +150,10 @@ namespace UnitTestProject
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             for (int i = 0; i < nTask; i++)
             {
-                int j = random.Next(1, 5000000);
-                var repository = FluentNHibernateHelper.GetRepositiory();
+                int j = random.Next(1, 50000000);
+                var viewapi = ViewHelper.GetViewApi();
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                IList<Blog> blogs = repository.Where<Blog>(blog => blog.Author >= j, quantity);
+                IList<Blog> blogs = viewapi.Where<Blog>(blog => blog.Author >= j, quantity);
                 stopwatch.Stop();
                 log.Info("Log Info - " + j + " : " + stopwatch.Elapsed);
                 totalGet.Add(stopwatch.Elapsed);
@@ -170,15 +172,15 @@ namespace UnitTestProject
         public void Test_Get_By_Id()
         {
             int quantity = 100;
-            int nTask = 1000;
+            int nTask = 100;
             Random random = new Random();
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             for (int i = 0; i < nTask; i++)
             {
-                int j = random.Next(1, 5000000);
-                var repository = FluentNHibernateHelper.GetRepositiory();
+                int j = random.Next(1, 50000000);
+                var viewapi = ViewHelper.GetViewApi();
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                IList<Blog> blogs = repository.Where<Blog>(blog => blog.Id >= j, quantity);
+                IList<Blog> blogs = viewapi.Where<Blog>(blog => blog.Id == j);
                 stopwatch.Stop();
                 log.Info("Log Info - " + j + " : " + stopwatch.Elapsed);
                 totalGet.Add(stopwatch.Elapsed);
@@ -197,16 +199,16 @@ namespace UnitTestProject
         public void Test_Get_By_Summary()
         {
             int quantity = 100;
-            int nTask = 1000;
+            int nTask = 100;
             Random random = new Random();
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             for (int i = 0; i < nTask; i++)
             {
-                int j = random.Next(1, 5000000);
-                var repository = FluentNHibernateHelper.GetRepositiory();
+                int j = random.Next(1, 50000000);
+                var viewapi = ViewHelper.GetViewApi();
                 var valCheck = "Summary of Blog " + j;
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                IList<Blog> blogs = repository.Where<Blog>(blog => blog.Summary == valCheck, quantity);
+                IList<Blog> blogs = viewapi.Where<Blog>(blog => blog.Summary == valCheck, quantity);
                 stopwatch.Stop();
                 log.Info("Log Info - " + j + " : " + stopwatch.Elapsed);
                 totalGet.Add(stopwatch.Elapsed);
@@ -239,9 +241,9 @@ namespace UnitTestProject
                     {
                     }
                     int j = random.Next(1, 5000000);
-                    var repository = FluentNHibernateHelper.GetRepositiory();
+                    var viewapi = ViewHelper.GetViewApi();
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    IList<Blog> blogs = repository.Where<Blog>(blog => blog.Author == j, quantity);
+                    IList<Blog> blogs = viewapi.Where<Blog>(blog => blog.Author == j, quantity);
                     stopwatch.Stop();
                     log.Info("Log Info - " + j + " : " + stopwatch.Elapsed);
                     Assert.IsNotNull(blogs);
@@ -258,8 +260,6 @@ namespace UnitTestProject
             Console.WriteLine("Get Times: " + GetAvg);
         }
 
-        
-        private Stopwatch mainStopwatch = new Stopwatch();
         /// <summary>
         /// Tìm kiếm bất đồng bộ theo trường Id
         /// </summary>
@@ -281,37 +281,25 @@ namespace UnitTestProject
                     }
 
                     long j = random.Next(1, 50000000);
-                    var repository = FluentNHibernateHelper.GetRepositiory();
+                    var viewapi = ViewHelper.GetViewApi();
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    IList<Blog> blogs = repository.Where<Blog>(blog => blog.Id >= j, quantity);
+                    IList<Blog> blogs = viewapi.Where<Blog>(blog => blog.Id >= j, quantity);
                     stopwatch.Stop();
                     log.Info("Log Info - " + j + " : " + stopwatch.Elapsed);
                     Assert.IsNotNull(blogs);
                     totalGet.Add(stopwatch.Elapsed);
-                    repository.Close();
+                    viewapi.Close();
                 });
                 task_i.Start();
                 tasks.Add(task_i);
             }
 
-            //mainStopwatch.Start();
-            //int n = 0;
-            //foreach (var task in tasks)
-            //{
-            //    n++;
-            //    if (task.Status.Equals(TaskStatus.Running))
-            //    {
-            //        log.Info("Log Info - Running");
-            //    }
-            //}
             IsRun = false;
             Task.WaitAll(tasks.ToArray());
-            //mainStopwatch.Stop();
 
             TimeSpan GetAvg = new TimeSpan(Convert.ToInt64(totalGet.Average(t => t.Ticks)));
             log.Info("Log Info - Get Times: " + GetAvg);
             Console.WriteLine("Get Times: " + GetAvg);
-            //log.Info("Log Info - " + n);
         }
 
         /// <summary>
@@ -321,9 +309,8 @@ namespace UnitTestProject
         public void Test_Get_By_Summary_Async()
         {
             bool IsRun = true;
-            int nTask = 100;
+            int nTask = 1000;
             Random random = new Random();
-            Timer timer = new Timer();
             int quantity = 100;
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             IList<Task> tasks = new List<Task>();
@@ -333,13 +320,13 @@ namespace UnitTestProject
                 {
                     while (IsRun)
                     {
-                        
+
                     }
                     int j = random.Next(1, 50000000);
                     var valCheck = "Summary of Blog " + j;
-                    var repository = FluentNHibernateHelper.GetRepositiory();
+                    var viewapi = ViewHelper.GetViewApi();
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    IList<Blog> blogs = repository.Where<Blog>(blog => blog.Summary == valCheck, quantity);
+                    IList<Blog> blogs = viewapi.Where<Blog>(blog => blog.Summary == valCheck, quantity);
                     stopwatch.Stop();
                     log.Info("Log Info - " + j + " : " + stopwatch.Elapsed);
                     Assert.IsNotNull(blogs);
@@ -480,16 +467,15 @@ namespace UnitTestProject
         {
 
             int quantity = 50;
-            int nTask = 100;
+            int nTask = 1;
             Random random = new Random();
 
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             for (int i = 0; i < nTask; i++)
             {
-                int j = random.Next(1, 500000);
+                int from = random.Next(1, 500000);
                 var repository = FluentNHibernateHelper.GetRepositiory();
-                IList<Blog> blogs = repository.Where<Blog>(b => b.Id >= 1, quantity);
-                //IList<Blog> blogs = repository.Where<Blog>(b => b.Author > j && b.Author <= quantity);
+                IList<Blog> blogs = repository.Where<Blog>(b => b.Author >= 1 && b.Author <= 10);
                 foreach (var blog in blogs)
                 {
                     blog.IsActive = true;
@@ -528,9 +514,10 @@ namespace UnitTestProject
             {
                 Task task_i = new Task(() =>
                 {
-                    int j = random.Next(1, 500000);
+                    long from = random.Next(1, 50000000);
+                    long to = from + quantity;
                     var repository = FluentNHibernateHelper.GetRepositiory();
-                    IList<Blog> blogs = repository.Where<Blog>(b => b.Id >= j, quantity);
+                    IList<Blog> blogs = repository.Where<Blog>(b => b.Id >= from && b.Id < to);
                     foreach (var blog in blogs)
                     {
                         blog.IsActive = false;
@@ -566,17 +553,18 @@ namespace UnitTestProject
         {
 
             Random random = new Random();
-            int quantity = 50;
-            int nTask = 100;
+            int quantity = 500;
+            int nTask = 18;
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             for (int i = 0; i < nTask; i++)
             {
-                int j = random.Next(1, 5000000);
+                //int j = random.Next(1, 5000000);
+                int j = i;
+                var from = 30000 - j* quantity;
+                var to = 30000 - j * quantity - quantity;
                 var repository = FluentNHibernateHelper.GetRepositiory();
-                IList<Blog> blogs = repository.Where<Blog>(b => b.Id >= j, quantity);
-
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                repository.Delete(blogs);
+                repository.Delete<Blog>(b => b.Id <= from && b.Id > to);
                 repository.Commit();
                 stopwatch.Stop();
                 log.Info("Log Info - Times: " + stopwatch.Elapsed);
@@ -635,60 +623,74 @@ namespace UnitTestProject
         [TestMethod]
         public void Test_Multiple_Task()
         {
-            int sum = 10000000;
+            int sum = 50000000;
             int quantity = 500;
-            int nTask = 100;
+            int nTask = 60;
             bool IsRun = true;
             IList<TimeSpan> totalInsert = new List<TimeSpan>();
             IList<TimeSpan> totalGet = new List<TimeSpan>();
             IList<TimeSpan> totalDelete = new List<TimeSpan>();
-
             List<Task> tasks = new List<Task>();
+            int temp_count_delete = -1;
+            int start = 30000;
+
             for (int i = 0; i < nTask; i++)
             {
                 int j = i + 1;
                 Task task_i = null;
-                if (j % 2 == 0)
+
+                // Insert
+                if (j % 3 == 0)
                 {
                     task_i = new Task(() =>
                     {
-                        while (IsRun)
-                        {
-                            
-                        }
+                        while (IsRun) { }
+
                         var repository1 = FluentNHibernateHelper.GetRepositiory();
                         IList<Blog> blogs = Prepare(quantity);
                         Stopwatch stopwatch = Stopwatch.StartNew();
                         repository1.Insert(blogs);
-                        //repository.Commit();
                         stopwatch.Stop();
-                        //log.Info("Times: " + stopwatch.Elapsed);
                         totalInsert.Add(stopwatch.Elapsed);
-                        //Assert.IsTrue(stopwatch.Elapsed < TimeSpan.FromSeconds(0.2));
-
                     });
                 }
+                // Delete
+                else if (j % 3 == 1)
+                {
+                    var tmp = temp_count_delete + 1;
+                    temp_count_delete++;
+                    task_i = new Task(() =>
+                    {
+                        while (IsRun) { }
+
+                        var repository2 = FluentNHibernateHelper.GetRepositiory();
+                        int from = start + tmp * quantity;
+                        int to = from + quantity;
+
+                        Stopwatch stopwatch = Stopwatch.StartNew();
+                        repository2.Delete<Blog>(p => p.Id > from && p.Id <= to);
+                        repository2.Commit();
+                        stopwatch.Stop();
+
+                        totalDelete.Add(stopwatch.Elapsed);
+                    });
+                }
+                // Get
                 else
                 {
                     task_i = new Task(() =>
                     {
-                        while (IsRun)
-                        {
-                            
-                        }
-                        var repository2 = FluentNHibernateHelper.GetRepositiory();
+                        while (IsRun) { }
+
+                        var viewapi = ViewHelper.GetViewApi();
+                        long from = new Random().Next(1, 50000000);
+                        long to = from + quantity;
 
                         Stopwatch stopwatch = Stopwatch.StartNew();
-                        int from = (j*500) * quantity;
-                        int to = (j*500) * quantity + quantity;
-                        IList<Blog> blogs = repository2.Where<Blog>(p => p.Id >= from && p.Id < to);
+                        IList<Blog> blogs = viewapi.Where<Blog>(p => p.Author < to && p.Author >= from);
                         stopwatch.Stop();
+
                         totalGet.Add(stopwatch.Elapsed);
-                        stopwatch.Start();
-                        repository2.Delete(blogs);
-                        repository2.Commit();
-                        stopwatch.Stop();
-                        totalDelete.Add(stopwatch.Elapsed);
                     });
                 }
                 task_i.Start();

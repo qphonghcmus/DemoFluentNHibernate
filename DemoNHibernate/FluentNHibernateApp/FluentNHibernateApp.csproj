@@ -66,14 +66,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Blog.cs" />
+    <Compile Include="Helper\IHelper.cs" />
     <Compile Include="Mappings\BlogMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\BulkRepository.cs" />
-    <Compile Include="Repositories\FluentNHibernateHelper.cs" />
-    <Compile Include="Repositories\Interceptor.cs" />
+    <Compile Include="Helper\FluentNHibernateHelper.cs" />
+    <Compile Include="Interceptor\Interceptor.cs" />
     <Compile Include="Repositories\IRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
+    <Compile Include="Views\IViewAPI.cs" />
+    <Compile Include="Views\ViewAPI.cs" />
+    <Compile Include="Helper\ViewHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

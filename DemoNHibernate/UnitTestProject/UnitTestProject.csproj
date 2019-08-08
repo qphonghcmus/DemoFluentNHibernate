@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="CreateInitialData_Test.cs" />
     <Compile Include="FNH_Test.cs" />
+    <Compile Include="FNH_Test_2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CRUD_Test.cs" />
     <Compile Include="TClass_Test.cs" />

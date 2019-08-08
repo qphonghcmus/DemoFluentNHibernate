@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FluentNHibernateApp.Repositories
 {
-    public interface IRepository
+    public interface IRepository 
     {
         // Get object T by Id
         T Get<T>(object id) where T : class;
@@ -36,11 +36,15 @@ namespace FluentNHibernateApp.Repositories
         // Delete list of objects T
         void Delete<T>(IList<T> obj) where T : class;
 
+        // 
+        void Delete<T>(Expression<Func<T, bool>> condition);
+
         // Update obj
         bool Update<T>(T obj) where T : class;
         
         // Update only property "field" of obj
         void Update<T>(T obj, Expression<Func<T, object>> field) where T : class;
+
 
         // commit transaction
         void Commit();

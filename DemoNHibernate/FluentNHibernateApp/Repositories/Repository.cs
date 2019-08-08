@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using NHibernate;
+using NHibernate.Linq;
 using NHibernate.Metadata;
 using NHibernate.Type;
 
@@ -101,6 +102,11 @@ namespace FluentNHibernateApp.Repositories
             {
                 Delete(tmp);
             }
+        }
+
+        public void Delete<T>(Expression<Func<T, bool>> condition)
+        {
+            session.Query<T>().Where(condition).Delete();
         }
 
         public bool Update<T>(T obj) where T : class

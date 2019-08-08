@@ -153,6 +153,11 @@ namespace FluentNHibernateApp.Repositories
             throw new NotImplementedException();
         }
 
+        public void Delete<T>(Expression<Func<T, bool>> condition)
+        {
+            throw new NotImplementedException();
+        }
+
         public T Get<T>(object id) where T : class
         {
             throw new NotImplementedException();

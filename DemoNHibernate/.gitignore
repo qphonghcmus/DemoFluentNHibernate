@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/DemoNhibernateApp/v15
+/CreateInitialData/bin/Debug
+/CreateInitialData/obj/Debug
+/DemoNhibernateApp/bin/Debug
+/DemoNhibernateApp/obj/Debug
+/packages
+/UnitTestProject/bin/Debug
+/UnitTestProject/obj/Debug
+/.vs
+/FluentNHibernateApp/obj/Debug
+/FluentNHibernateApp/bin/Debug
