@@ -36,7 +36,7 @@ namespace FluentNHibernateApp.Repositories
         // Delete list of objects T
         void Delete<T>(IList<T> obj) where T : class;
 
-        // 
+        // Delete obj - "condition"
         void Delete<T>(Expression<Func<T, bool>> condition);
 
         // Update obj
@@ -48,6 +48,9 @@ namespace FluentNHibernateApp.Repositories
 
         // commit transaction
         void Commit();
+
+        // commit transaction
+        void Clear();
 
         // Disconnect and clean session
         void Close();

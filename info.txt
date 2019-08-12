@@ -1,0 +1,3 @@
+Log Info - Insert Times: 00:00:00.0741338
+Log Info - Get Times: 00:00:00.0024958
+Log Info - Delete Times: 00:00:00.0053470

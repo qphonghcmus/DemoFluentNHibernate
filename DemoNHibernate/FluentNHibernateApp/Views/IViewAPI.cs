@@ -21,6 +21,9 @@ namespace FluentNHibernateApp.Views
         // Get "quantity" objects T by condition
         IList<T> Where<T>(Expression<Func<T, bool>> condition, int quantity) where T : class;
 
+        // clear session
+        void Clear();
+
         // Disconnect and clean session
         void Close();
 

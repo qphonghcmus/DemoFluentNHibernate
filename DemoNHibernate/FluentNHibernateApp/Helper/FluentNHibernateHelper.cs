@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentNHibernate.Automapping;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using FluentNHibernateApp.Entities;
+using FluentNHibernateApp.Repositories;
 using NHibernate;
-using NHibernate.Cfg;
 using NHibernate.Metadata;
 using NHibernate.Tool.hbm2ddl;
 
-namespace FluentNHibernateApp.Repositories
+namespace FluentNHibernateApp.Helper
 {
     public class FluentNHibernateHelper
     {
@@ -33,9 +28,9 @@ namespace FluentNHibernateApp.Repositories
                             .Mappings(m => m.FluentMappings.AddFromAssemblyOf<Blog>())
                             .ExposeConfiguration(cfg =>
                             {
-                                //cfg.SetProperty("adonet.batch_size", "100");
-                                //cfg.SetProperty("connection.release_mode", "on_close");
-                                new SchemaUpdate(cfg).Execute(false,true);
+                                cfg.SetProperty("adonet.batch_size", "100");
+                                cfg.SetProperty("command_timeout", (TimeSpan.FromMinutes(1).TotalSeconds.ToString()));
+                                new SchemaUpdate(cfg).Execute(false, true);
                             })
                             .BuildSessionFactory();
                     }
@@ -62,7 +57,7 @@ namespace FluentNHibernateApp.Repositories
 
         public static IRepository GetRepositiory()
         {
-            return new Repository(SessionFactory.OpenSession(new Interceptor()));
+            return new Repository(SessionFactory.OpenSession(new Interceptor.Interceptor()));
         }
 
         public static ISession GetSession()

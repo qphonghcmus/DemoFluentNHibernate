@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using FluentNHibernateApp.Helper;
 using NHibernate;
 using NHibernate.Metadata;
 using NHibernate.Type;
@@ -17,7 +18,7 @@ namespace FluentNHibernateApp.Repositories
     {
         #region properties
 
-        private IStatelessSession _statelessSession;
+        private readonly IStatelessSession _statelessSession;
         private DataTable _table;
         private List<string> _columns;
 
@@ -133,6 +134,11 @@ namespace FluentNHibernateApp.Repositories
         #endregion
 
         #region Null Methods
+
+        public void Clear()
+        {
+        }
+
         public void Close()
         {
             throw new NotImplementedException();

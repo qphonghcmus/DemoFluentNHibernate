@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NHibernate;
 using NHibernate.SqlCommand;
 
-namespace FluentNHibernateApp.Repositories
+namespace FluentNHibernateApp.Interceptor
 {
     public class Interceptor : EmptyInterceptor
     {

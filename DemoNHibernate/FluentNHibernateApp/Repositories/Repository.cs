@@ -11,7 +11,7 @@ using NHibernate.Type;
 
 namespace FluentNHibernateApp.Repositories
 {
-    public class Repository : IRepository
+    public class Repository : IRepository,IDisposable
     {
         #region properties
 
@@ -26,6 +26,16 @@ namespace FluentNHibernateApp.Repositories
         {
             session = _session;
         }
+
+        private void Refresh()
+        {
+            if (session != null && !session.IsOpen)
+            {
+                //session.Reconnect();
+                session.Connection.Open();
+            }
+        }
+
         #endregion
 
         #region Implemented Methods
@@ -52,6 +62,7 @@ namespace FluentNHibernateApp.Repositories
 
         public bool Insert<T>(T obj) where T : class
         {
+            Refresh();
             try
             {
                 session.SaveOrUpdate(obj);
@@ -59,13 +70,13 @@ namespace FluentNHibernateApp.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return false;
+                throw e;
             }
         }
 
         public void Insert<T>(IList<T> obj) where T : class
         {
+            Refresh();
             using (ITransaction transaction = session.BeginTransaction())
             {
                 foreach (var x1 in obj)
@@ -84,6 +95,7 @@ namespace FluentNHibernateApp.Repositories
 
         public bool Delete<T>(T obj) where T : class
         {
+            Refresh();
             try
             {
                 session.Delete(obj);
@@ -91,13 +103,13 @@ namespace FluentNHibernateApp.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return false;
+                throw e;
             }
         }
 
         public void Delete<T>(IList<T> obj) where T : class
         {
+            Refresh();
             foreach (var tmp in obj)
             {
                 Delete(tmp);
@@ -106,11 +118,13 @@ namespace FluentNHibernateApp.Repositories
 
         public void Delete<T>(Expression<Func<T, bool>> condition)
         {
+            Refresh();
             session.Query<T>().Where(condition).Delete();
         }
 
         public bool Update<T>(T obj) where T : class
         {
+            Refresh();
             try
             {
                 session.Update(obj);
@@ -118,13 +132,13 @@ namespace FluentNHibernateApp.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                return false;
+                throw e;
             }
         }
 
         public void Update<T>(T obj, Expression<Func<T, object>> field) where T : class
         {
+            Refresh();
             MemberExpression m;
             if (field.Body is MemberExpression)
             {
@@ -170,6 +184,7 @@ namespace FluentNHibernateApp.Repositories
 
         public void Commit()
         {
+            Refresh();
             using (ITransaction transaction = session.BeginTransaction())
             {
                 try
@@ -181,18 +196,30 @@ namespace FluentNHibernateApp.Repositories
                 {
                     //Console.WriteLine(e);
                     transaction.Rollback();
-                    Console.WriteLine("Commit Failed");
+                    //Console.WriteLine("Commit Failed");
+                    throw e;
                 }
             }
+            session.Clear();
+        }
+
+        public void Clear()
+        {
+            Refresh();
             session.Clear();
         }
 
         public void Close()
         {
             session.Close();
-
+            session?.Dispose();
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            session?.Dispose();
+        }
     }
 }
